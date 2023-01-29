@@ -1945,7 +1945,7 @@ void handle_event_anbernic(int type, int code, int value) {
 		}
 
 		// mouse movement, left analog
-		if (left_analog_mouse) {
+		if (left_analog_mouse && !left_analog_disabled) {
 			if (code == 3) { // up/down
 				if (value > deadzone_y) {
 					emit(EV_REL, REL_Y, -1);
@@ -2001,7 +2001,7 @@ void handle_event_anbernic(int type, int code, int value) {
 				}
 			}
 		}
-		else {	
+		else if (!left_analog_disabled){	
 			if (code == 3) { // w/s
 				if (value > deadzone_y) {
 					emit(EV_KEY, left_analog_up, 1);
