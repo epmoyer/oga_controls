@@ -35,6 +35,8 @@
 
 #include "parser.h"
 
+#define INPUT_DISABLED 0x3ff
+
 struct libevdev* dev_joypad;
 int fd_ev_joypad;
 int rc_joypad;
@@ -98,6 +100,8 @@ int right_analog_y = 0;
 
 int left_analog_mouse = 0;
 int right_analog_mouse = 0;
+
+int left_analog_disabled = 0;
 
 int hold = 0;
 
@@ -1708,14 +1712,16 @@ void handle_event_anbernic(int type, int code, int value) {
 			emit(EV_SYN, SYN_REPORT, 0);
 		}
 
-		if (code == a_key && (value == 1 || value == 2)) {
-			emit(EV_KEY, a, 1);
-			emit(EV_SYN, SYN_REPORT, 0);
-		}
-		else if (code == a_key && value == 0) {
-			emit(EV_KEY, a, 0);
-			emit(EV_SYN, SYN_REPORT, 0);
-		}
+        if(a != INPUT_DISABLED){
+            if (code == a_key && (value == 1 || value == 2)) {
+                emit(EV_KEY, a, 1);
+                emit(EV_SYN, SYN_REPORT, 0);
+            }
+            else if (code == a_key && value == 0) {
+                emit(EV_KEY, a, 0);
+                emit(EV_SYN, SYN_REPORT, 0);
+            }
+        }
 
 		if (code == b_key && (value == 1 || value == 2)) {
 			emit(EV_KEY, b, 1);
@@ -2043,8 +2049,10 @@ void handle_event_anbernic(int type, int code, int value) {
 short char_to_keycode(char str[]) {
 	short keycode;
 
+	if (strcmp(str, "none") == 0) keycode = INPUT_DISABLED;
+
 	// arrow keys
-	if (strcmp(str, "up") == 0) keycode = KEY_UP;
+	else if (strcmp(str, "up") == 0) keycode = KEY_UP;
 	else if (strcmp(str, "down") == 0) keycode = KEY_DOWN;
 	else if (strcmp(str, "left") == 0) keycode = KEY_LEFT;
 	else if (strcmp(str, "right") == 0) keycode = KEY_RIGHT;
@@ -2398,7 +2406,10 @@ int main(int argc, char* argv[]) {
 	    		right = char_to_keycode(co->value);
 	    	}
 	    	else if (strcmp(co->key, "left_analog_up") == 0) {
-	    		if (strcmp(co->value, "mouse_movement_up") == 0) {
+	    		if (strcmp(co->value, "none") == 0) {
+	    			left_analog_disabled = 1;
+	    		}
+	    		else if (strcmp(co->value, "mouse_movement_up") == 0) {
 	    			left_analog_mouse = 1;
 	    		}
 	    		else {
