@@ -2081,6 +2081,7 @@ short char_to_keycode(char str[]) {
 	else if (strcmp(str, "delete") == 0) keycode = KEY_DELETE;
 	else if (strcmp(str, "capslock") == 0) keycode = KEY_CAPSLOCK;
 	else if (strcmp(str, "tab") == 0) keycode = KEY_TAB;
+	else if (strcmp(str, "print") == 0) keycode = KEY_PRINT;
 
 	// normal keyboard
 	else if (strcmp(str, "a") == 0) keycode = KEY_A;
